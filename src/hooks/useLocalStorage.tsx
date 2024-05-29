@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
+import type { EventForm } from '../context/ModalsContext'
 
 
-
-const saveValue = (key: string, value: any) => {
+const saveValue = <T,>(key: string, value: T) => {
     console.log(key, value)
     localStorage.setItem(key, JSON.stringify(value))
 }
 
-const getValue = (key: string, defaultValue: any) => {
+const getValue = <T,>(key: string, defaultValue: T) => {
     const storageItem = localStorage.getItem(key)
     if (!storageItem) return defaultValue
-    let savedValue = JSON.parse(storageItem)
-    if (savedValue instanceof Array && savedValue[0]?.date) savedValue = savedValue.map(obj => ({...obj, date: new Date(obj.date)})) 
+    let savedValue: T | EventForm[] = JSON.parse(storageItem)
+    if (Array.isArray(savedValue) && savedValue.length > 0 && typeof savedValue[0] === 'object' && savedValue[0] != null && 'date' in savedValue[0]) savedValue = savedValue.map(obj => (obj.date && {...obj, date: new Date(obj.date)})) as EventForm[]
     console.log(savedValue)
     if (savedValue) return savedValue
     if (defaultValue instanceof Function) return defaultValue()
